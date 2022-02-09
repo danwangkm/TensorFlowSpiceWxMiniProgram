@@ -1,5 +1,4 @@
 import { SpiceModel } from '../../model/spiceModel';
-const tf = require('@tensorflow/tfjs-core');
 // index.js
 // 获取应用实例
 const app = getApp()
