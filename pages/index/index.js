@@ -2,6 +2,7 @@ import { SpiceModel } from '../../model/spiceModel';
 // index.js
 // 获取应用实例
 const app = getApp()
+const recorderManager = wx.getRecorderManager();
 
 Page({
   data: {
@@ -24,6 +25,11 @@ Page({
         canIUseGetUserProfile: true
       })
     }
+
+    recorderManager.onFrameRecorded((res) => {
+      const voiceData = new Float32Array(res.frameBuffer);
+      console.log(`recorded frameBuffer: ${voiceData}`);
+    });
   },
   getUserProfile(e) {
     // 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认，开发者妥善保管用户快速填写的头像昵称，避免重复弹窗
@@ -56,9 +62,34 @@ Page({
         this.spiceModel = model;
         console.log('loaded spice model successfully');
         // this.setData({ result: 'model loaded.' });
+        wx.showToast({
+          title: '模型加载成功',
+          icon: 'success',
+          duration: 1500,
+        });
       }).catch((e) => {
         console.error(e);
+        wx.showToast({
+          title: '模型加载失败',
+          icon: 'error',
+          duration: 1500,
+        });
       });
     }
-  }
+  },
+  onStartHandler(event) {
+    console.log(`click: ${JSON.stringify(event)}`);
+
+    recorderManager.start({
+      duration: 60000,
+      // sampleRate: 22050,
+      numberOfChannels: 1,
+      // encodeBitRate: 32000,
+      frameSize: 5,
+      format: "mp3"
+    });
+  },
+  onEndHandler(event) {
+    recorderManager.stop();
+  },
 })

@@ -11,6 +11,9 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
+  "useExtendedLib": {
+    "weui": true
+  },
   "plugins": {
     "tfjsPlugin": {
       "version": "0.2.0",

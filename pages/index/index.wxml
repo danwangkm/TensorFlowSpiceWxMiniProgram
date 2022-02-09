@@ -17,7 +17,10 @@
       <text class="userinfo-nickname">{{userInfo.nickName}}</text>
     </block>
   </view>
+  <button class="weui-btn weui-btn_primary" bindtap="onStartHandler">Start</button>
+  <button class="weui-btn weui-btn_default" bindtap="onEndHandler">End</button>
   <view class="usermotto">
     <text class="user-motto">{{motto}}</text>
   </view>
+  
 </view>
