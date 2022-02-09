@@ -27,7 +27,7 @@ Page({
     }
 
     recorderManager.onFrameRecorded((res) => {
-      const voiceData = new Float32Array(res.frameBuffer);
+      const voiceData = new Uint8Array(res.frameBuffer);
       console.log(`recorded frameBuffer: ${voiceData}`);
     });
   },
@@ -53,7 +53,6 @@ Page({
     })
   },
   async onReady() {
-    console.log('I am ready');
     if (this.spiceModel == null) {
       console.log('loading spice model...');
       const model = new SpiceModel(this);
@@ -82,11 +81,11 @@ Page({
 
     recorderManager.start({
       duration: 60000,
-      // sampleRate: 22050,
+      sampleRate: 16000,
       numberOfChannels: 1,
-      // encodeBitRate: 32000,
+      encodeBitRate: 32000,
       frameSize: 5,
-      format: "mp3"
+      format: "pcm"
     });
   },
   onEndHandler(event) {
