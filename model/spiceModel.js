@@ -42,4 +42,8 @@ export class SpiceModel {
     const cqt_bin = modelPitch * PT_SLOPE + PT_OFFSET;
     return fmin * Math.pow(2.0, (1.0 * cqt_bin / bins_per_octave))
   }
+
+  getModel() {
+    return this.model;
+  }
 }
