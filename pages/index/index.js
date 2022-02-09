@@ -1,3 +1,5 @@
+import { SpiceModel } from '../../model/spiceModel';
+const tf = require('@tensorflow/tfjs-core');
 // index.js
 // 获取应用实例
 const app = getApp()
@@ -44,5 +46,20 @@ Page({
       userInfo: e.detail.userInfo,
       hasUserInfo: true
     })
+  },
+  async onReady() {
+    console.log('I am ready');
+    if (this.spiceModel == null) {
+      console.log('loading spice model...');
+      const model = new SpiceModel(this);
+      model.load().then(() => {
+        // this.setData({ result: 'loading spice model...' });
+        this.spiceModel = model;
+        console.log('loaded spice model successfully');
+        // this.setData({ result: 'model loaded.' });
+      }).catch((e) => {
+        console.error(e);
+      });
+    }
   }
 })

@@ -1,0 +1,26 @@
+{
+  "name": "miniprogram-1",
+  "version": "1.0.0",
+  "description": "TensorFlowSpiceWxMiniProgram",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danwangkm/TensorFlowSpiceWxMiniProgram.git"
+  },
+  "author": "danwangkm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danwangkm/TensorFlowSpiceWxMiniProgram/issues"
+  },
+  "homepage": "https://github.com/danwangkm/TensorFlowSpiceWxMiniProgram#readme",
+  "dependencies": {
+    "encoding": "^0.1.0",
+    "@tensorflow/tfjs-core": "3.8.0",
+    "@tensorflow/tfjs-converter": "3.8.0",
+    "@tensorflow/tfjs-backend-webgl": "3.8.0",
+    "fetch-wechat": "0.0.3"
+  }
+}
