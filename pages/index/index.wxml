@@ -19,6 +19,8 @@
   </view>
   <button class="weui-btn weui-btn_primary" bindtap="onStartHandler">Start</button>
   <button class="weui-btn weui-btn_default" bindtap="onEndHandler">End</button>
+  <button class="weui-btn weui-btn_default" bindtap="onPlayHandler">Play</button>
+  <button class="weui-btn weui-btn_default" bindtap="onPlayFlamesHandler">PlayFlames</button>
   <view class="usermotto">
     <text class="user-motto">{{motto}}</text>
   </view>
