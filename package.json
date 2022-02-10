@@ -21,6 +21,7 @@
     "@tensorflow/tfjs-core": "3.8.0",
     "@tensorflow/tfjs-converter": "3.8.0",
     "@tensorflow/tfjs-backend-webgl": "3.8.0",
-    "fetch-wechat": "0.0.3"
+    "fetch-wechat": "0.0.3",
+    "js-mp3": "0.1.0"
   }
 }

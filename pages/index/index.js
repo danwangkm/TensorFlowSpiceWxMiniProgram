@@ -1,11 +1,14 @@
 import { SpiceModel } from '../../model/spiceModel';
 import * as tf from '@tensorflow/tfjs-core';
+let Mp3 = require('js-mp3');
+const fs = wx.getFileSystemManager()
 // index.js
 // 获取应用实例
 const app = getApp()
 const recorderManager = wx.getRecorderManager();
-const innerAudioContext = wx.createInnerAudioContext();
-const audioCtx = wx.createWebAudioContext(true)
+const innerAudioContext = wx.createInnerAudioContext(true);
+const audioCtx = wx.createWebAudioContext(true);
+// const myAudioCtx = wx.createAudioContext(true);
 const recordList = [];
 Page({
   spiceModel: undefined,
@@ -32,6 +35,15 @@ Page({
 
     recorderManager.onFrameRecorded((res) => {
       recordList.push(res.frameBuffer);
+      console.log(`bytelength: ${res.frameBuffer.byteLength}`);
+      // let decoder = Mp3.newDecoder(res.frameBuffer)
+      // let pcmArrayBuffer = decoder.decode()
+      // console.log(`pcmArrayBuffer: ${pcmArrayBuffer}`);
+      // console.log(`base64: ${wx.arrayBufferToBase64(res.frameBuffer)}`);
+      console.log(`framearray: ${new Uint8Array(res.frameBuffer)}`);
+
+
+      // console.log(`get: ${new Float32Array(res.frameBuffer)}`);
       // const CONF_THRESHOLD = 0.5;
       // const voiceData = new Uint8Array(res.frameBuffer);
 
@@ -119,7 +131,19 @@ Page({
     });
     recorderManager.onStop((res) => {
       this.tempFilePath = res.tempFilePath;
-      console.log('停止录音', res.tempFilePath)
+      console.log('停止录音', res.tempFilePath);
+      fs.readFile({
+        filePath: this.tempFilePath,
+        // encoding: 'base64',
+        position: 0,
+        success(res) {
+          // console.log(`filedata: ${res.data}`)
+          console.log(`filearray: ${new Uint8Array(res.data)}`);
+        },
+        fail(res) {
+          console.error(res)
+        }
+      })
     });
     innerAudioContext.onPlay(() => {
       console.log('开始播放')
@@ -145,49 +169,51 @@ Page({
   async onPlayFlamesHandler(e) {
     console.log(`start size of buffer: ${recordList.length}`);
     let source = audioCtx.createBufferSource();
-    var myArrayBuffer = audioCtx.createBuffer(1, 0, 16000);
+    let testBuffer;
+    var myArrayBuffer = audioCtx.createBuffer(1, 16000, 16000);
+    console.log(`myArrayBuffer: ${myArrayBuffer.length}`);
+
     await recordList.forEach(async (arrayBuffer, index) => {
-      console.log(`start play: ${new Uint8Array(arrayBuffer)}`);
-      let input = Float32Array.from(new Uint8Array(arrayBuffer));
+      // console.log(`start play: ${new Uint8Array(arrayBuffer)}`);
+      let vector = 32768.0;
+      let input = Float32Array.from(new Uint8Array(arrayBuffer), num => num / vector);
+      console.log(`input: ${input}`);
       // try {
-      //   let res = await audioCtx.decodeAudioData(arrayBuffer);
-      //   source.buffer = res;
-      //   source.connect(audioCtx.destination);
-      //   source.start();
+      //   await audioCtx.decodeAudioData(arrayBuffer).then((res) => {
+      //     let currentLength = myArrayBuffer.length;
+      //     myArrayBuffer.getChannelData(0).set(res, currentLength);
+      //     console.log(`myArrayBuffer: ${myArrayBuffer.length}`);
+      //   });
       // } catch (error) {
       //   console.error(error);
       // }
       
-      audioCtx.decodeAudioData(arrayBuffer, (res) => {
-        // this can run in real phone and play a little sound
-        console.log(`yes: ${res}`);
-        myArrayBuffer = this.appendBuffer(myArrayBuffer, res);
-        source.buffer = res;
-        source.connect(audioCtx.destination);
-        source.start();
-      }, (error) => {
-        console.error(error);
-      });
-      // myArrayBuffer.copyToChannel(input, 0, 16000 * index);
+      // audioCtx.decodeAudioData(arrayBuffer, (res) => {
+      //   // this can run in real phone and play a little sound
+      //   console.log(`yes: ${res}`);
+      //   myArrayBuffer = this.appendBuffer(myArrayBuffer, res);
+      //   source.buffer = res;
+      //   source.connect(audioCtx.destination);
+      //   source.start();
+      // }, (error) => {
+      //   // console.error(error);
+      // });
+
+
+      myArrayBuffer.copyToChannel(input, 0, 16000 * index);
+      // testBuffer = audioCtx.createBuffer(1, 16000 * (index + 1), 16000);
+      // try {
+      //   let temp = new Float32Array(arrayBuffer);
+      //   testBuffer.getChannelData(0).set(temp, 16000 * index);
+      //   console.log(testBuffer.length);
+      // } catch (error) {
+        
+      // }
+      
     });
-    // source.buffer = myArrayBuffer;
-    // source.connect(audioCtx.destination);
-    // source.start();
+    source.buffer = myArrayBuffer;
+    source.connect(audioCtx.destination);
+    source.start();
   },
-  /**
-   * Appends two ArrayBuffers into a new one.
-   * 
-   * @param {ArrayBuffer} buffer1 The first buffer.
-   * @param {ArrayBuffer} buffer2 The second buffer.
-   */
-  appendBuffer: (buffer1, buffer2) => {
-    var numberOfChannels = Math.min( buffer1.numberOfChannels, buffer2.numberOfChannels );
-    var tmp = context.createBuffer( numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate );
-    for (var i=0; i<numberOfChannels; i++) {
-      var channel = tmp.getChannelData(i);
-      channel.set( buffer1.getChannelData(i), 0);
-      channel.set( buffer2.getChannelData(i), buffer1.length);
-    }
-    return tmp;
-  }
+  
 })
