@@ -1,5 +1,7 @@
 import { SpiceModel } from '../../model/spiceModel';
 import * as tf from '@tensorflow/tfjs-core';
+const fft = require('fft-js').fft;
+const fftUtil = require('fft-js').util
 const fs = wx.getFileSystemManager()
 // index.js
 // 获取应用实例
@@ -27,6 +29,29 @@ Page({
       const CONF_THRESHOLD = 0.9;
       const channelData = e.inputBuffer.getChannelData(0);
       // console.log(`channel data length: ${channelData.length}`);
+      var phasors= fft(channelData);
+      // console.log(`phasors: ${phasors}`);
+      var frequencies = fftUtil.fftFreq(phasors, 16000);
+      // var magnitudes = fftUtil.fftMag(phasors); 
+      // const result = {
+      //   frequencies,
+      //   magnitudes
+      // };
+      // const sum = frequencies.reduce((a, b) => a + b, 0);
+      // const avg = sum / frequencies.length;
+      console.log(JSON.stringify(frequencies));
+      // const data = Math.max(...frequencies);
+      // frequencies.forEach((item) => {
+      //   that.setData({
+      //     motto: item
+      //   })
+      // });
+      that.setData({
+            motto: frequencies[frequencies.length / 2]
+          })
+      // console.log(`frequencies avg: ${data}`)
+      
+
       if (that.spiceModel) {
         console.log('start execute model...');
         const input = tf.reshape(tf.tensor(channelData), [NUM_INPUT_SAMPLES])
@@ -90,26 +115,26 @@ Page({
     });
   },
   async onReady() {
-    if (this.spiceModel == null) {
-      console.log('loading spice model...');
-      const model = new SpiceModel(this);
-      model.load().then(() => {
-        this.spiceModel = model;
-        console.log('loaded spice model successfully');
-        wx.showToast({
-          title: '模型加载成功',
-          icon: 'success',
-          duration: 1500,
-        });
-      }).catch((e) => {
-        console.error(e);
-        wx.showToast({
-          title: '模型加载失败',
-          icon: 'error',
-          duration: 1500,
-        });
-      });
-    }
+    // if (this.spiceModel == null) {
+    //   console.log('loading spice model...');
+    //   const model = new SpiceModel(this);
+    //   model.load().then(() => {
+    //     this.spiceModel = model;
+    //     console.log('loaded spice model successfully');
+    //     wx.showToast({
+    //       title: '模型加载成功',
+    //       icon: 'success',
+    //       duration: 1500,
+    //     });
+    //   }).catch((e) => {
+    //     console.error(e);
+    //     wx.showToast({
+    //       title: '模型加载失败',
+    //       icon: 'error',
+    //       duration: 1500,
+    //     });
+    //   });
+    // }
   },
   onRecordTouchStartHandler(event) {
     console.log(`start record: ${JSON.stringify(event)}`);
