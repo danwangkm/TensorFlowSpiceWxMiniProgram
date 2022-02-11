@@ -1,6 +1,5 @@
 import { SpiceModel } from '../../model/spiceModel';
 import * as tf from '@tensorflow/tfjs-core';
-let Mp3 = require('js-mp3');
 const fs = wx.getFileSystemManager()
 // index.js
 // 获取应用实例
@@ -8,8 +7,7 @@ const app = getApp()
 const recorderManager = wx.getRecorderManager();
 const innerAudioContext = wx.createInnerAudioContext(true);
 const audioCtx = wx.createWebAudioContext(true);
-// const myAudioCtx = wx.createAudioContext(true);
-const recordList = [];
+let recordList = [];
 Page({
   spiceModel: undefined,
   data: {
@@ -36,40 +34,6 @@ Page({
     recorderManager.onFrameRecorded((res) => {
       recordList.push(res.frameBuffer);
       console.log(`bytelength: ${res.frameBuffer.byteLength}`);
-      // let decoder = Mp3.newDecoder(res.frameBuffer)
-      // let pcmArrayBuffer = decoder.decode()
-      // console.log(`pcmArrayBuffer: ${pcmArrayBuffer}`);
-      // console.log(`base64: ${wx.arrayBufferToBase64(res.frameBuffer)}`);
-      console.log(`framearray: ${new Uint8Array(res.frameBuffer)}`);
-
-
-      // console.log(`get: ${new Float32Array(res.frameBuffer)}`);
-      // const CONF_THRESHOLD = 0.5;
-      // const voiceData = new Uint8Array(res.frameBuffer);
-
-      // console.log(`recorded frameBuffer: ${voiceData.length}`);
-      // let inputLength = 1024;//voiceData.length - voiceData.length % 1024;
-      // const trunckedVoiceData = Float32Array.from(voiceData).slice(0, inputLength);
-      // console.log(`trunckedVoiceData data: ${trunckedVoiceData.length}`)
-      // if (this.spiceModel) {
-      //   console.log('start execute model...');
-      //   const input = tf.reshape(tf.tensor(trunckedVoiceData), [inputLength]);
-      //   console.log(`start my input: ${input}`);
-      //   const output = this.spiceModel.getModel().execute({"input_audio_samples": input });
-      //   console.log(`start my output: ${output}`);
-
-      //   const uncertainties = output[0].dataSync();
-      //   const pitches = output[1].dataSync();
-      //   console.log(`uncertainties min: ${Math.min(...uncertainties)}`);
-      //   // console.log(`pitches: ${pitches}`);
-      //   for (let i = 0; i < pitches.length; ++i) {
-      //     let confidence = 1.0 - uncertainties[i];
-      //     if (confidence < CONF_THRESHOLD) {
-      //       continue;
-      //     }
-      //     console.log(`getPitchHz: ${this.spiceModel.getPitchHz(pitches[i])}`);
-        // }
-      // }
       
     });
   },
@@ -120,6 +84,7 @@ Page({
   },
   onStartHandler(event) {
     console.log(`click: ${JSON.stringify(event)}`);
+    recordList = [];
 
     recorderManager.start({
       duration: 12000,
@@ -131,6 +96,7 @@ Page({
     });
     recorderManager.onStop((res) => {
       this.tempFilePath = res.tempFilePath;
+      const duration = res.duration;
       console.log('停止录音', res.tempFilePath);
       fs.readFile({
         filePath: this.tempFilePath,
@@ -139,6 +105,14 @@ Page({
         success(res) {
           // console.log(`filedata: ${res.data}`)
           console.log(`filearray: ${new Uint8Array(res.data)}`);
+          // it worked
+          let source = audioCtx.createBufferSource();
+          audioCtx.decodeAudioData(res.data, (buffer) => {
+            console.log(`ok: ${buffer.getChannelData(0)}`);
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start();
+          }, (e) => {console.error(e)});
         },
         fail(res) {
           console.error(res)
@@ -169,51 +143,45 @@ Page({
   async onPlayFlamesHandler(e) {
     console.log(`start size of buffer: ${recordList.length}`);
     let source = audioCtx.createBufferSource();
-    let testBuffer;
-    var myArrayBuffer = audioCtx.createBuffer(1, 16000, 16000);
-    console.log(`myArrayBuffer: ${myArrayBuffer.length}`);
-
-    await recordList.forEach(async (arrayBuffer, index) => {
-      // console.log(`start play: ${new Uint8Array(arrayBuffer)}`);
-      let vector = 32768.0;
-      let input = Float32Array.from(new Uint8Array(arrayBuffer), num => num / vector);
-      console.log(`input: ${input}`);
-      // try {
-      //   await audioCtx.decodeAudioData(arrayBuffer).then((res) => {
-      //     let currentLength = myArrayBuffer.length;
-      //     myArrayBuffer.getChannelData(0).set(res, currentLength);
-      //     console.log(`myArrayBuffer: ${myArrayBuffer.length}`);
-      //   });
-      // } catch (error) {
-      //   console.error(error);
-      // }
+    
+    var _appendBuffer = function(buffer1, buffer2) {
+      var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+      tmp.set(new Uint8Array(buffer1), 0);
+      tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+      return tmp.buffer;
+    };
+    let prefix;
+    let finalAudio;
+    for (let index = 0; index<recordList.length; index++) {
+      let arrayBuffer = recordList[index];
+      let temp = arrayBuffer.slice(0);
+      if (index === 0) {
+        prefix = arrayBuffer.slice(0, 4);
+      } else {
+        temp = _appendBuffer(prefix, arrayBuffer);
+      }
       
-      // audioCtx.decodeAudioData(arrayBuffer, (res) => {
-      //   // this can run in real phone and play a little sound
-      //   console.log(`yes: ${res}`);
-      //   myArrayBuffer = this.appendBuffer(myArrayBuffer, res);
-      //   source.buffer = res;
-      //   source.connect(audioCtx.destination);
-      //   source.start();
-      // }, (error) => {
-      //   // console.error(error);
-      // });
-
-
-      myArrayBuffer.copyToChannel(input, 0, 16000 * index);
-      // testBuffer = audioCtx.createBuffer(1, 16000 * (index + 1), 16000);
-      // try {
-      //   let temp = new Float32Array(arrayBuffer);
-      //   testBuffer.getChannelData(0).set(temp, 16000 * index);
-      //   console.log(testBuffer.length);
-      // } catch (error) {
-        
-      // }
-      
-    });
-    source.buffer = myArrayBuffer;
-    source.connect(audioCtx.destination);
-    source.start();
+      audioCtx.decodeAudioData(temp, (res) => {
+        console.log(`yes ${index}: ${res.getChannelData(0)}`);
+        if (!finalAudio) {
+          finalAudio = res;
+        } else {
+          let tmp = audioCtx.createBuffer(1, (finalAudio.length + res.length), finalAudio.sampleRate );
+          let channel = tmp.getChannelData(0);
+          channel.set( finalAudio.getChannelData(0), 0);
+          channel.set( res.getChannelData(0), finalAudio.length);
+          finalAudio = tmp;
+        }
+        if (index === recordList.length - 1) {
+          console.log('final index');
+          source.buffer = finalAudio;
+          source.connect(audioCtx.destination);
+          source.start();
+        }
+      }, (error) => {
+        console.error(error);
+      });
+    }
   },
   
 })
