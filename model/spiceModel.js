@@ -4,8 +4,8 @@ const MODEL_SAMPLE_RATE = 16000;
 const PT_OFFSET = 25.58
 const PT_SLOPE = 63.07
 const CONF_THRESHOLD = 0.9;
-const MODEL_URL = 'https://tfhub.dev/google/tfjs-model/spice/1/default/1'; // Simple
-// const MODEL_URL = 'https://tfhub.dev/google/tfjs-model/spice/2/default/1'; // Advanced
+// const MODEL_URL = 'https://tfhub.dev/google/tfjs-model/spice/1/default/1'; // Simple
+const MODEL_URL = 'https://tfhub.dev/google/tfjs-model/spice/2/default/1'; // Advanced
 
 const STORAGE_KEY = 'spice_model';
 export class SpiceModel {

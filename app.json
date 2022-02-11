@@ -1,5 +1,6 @@
 {
   "pages":[
+    "pages/touchRecording/touchRecording",
     "pages/index/index",
     "pages/logs/logs"
   ],
