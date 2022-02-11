@@ -104,7 +104,7 @@ Page({
         position: 0,
         success(res) {
           // console.log(`filedata: ${res.data}`)
-          console.log(`filearray: ${new Uint8Array(res.data)}`);
+          // console.log(`filearray: ${new Uint8Array(res.data)}`);
           // it worked
           let source = audioCtx.createBufferSource();
           audioCtx.decodeAudioData(res.data, (buffer) => {
