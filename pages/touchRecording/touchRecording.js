@@ -5,12 +5,12 @@ const fs = wx.getFileSystemManager()
 // 获取应用实例
 const app = getApp()
 const recorderManager = wx.getRecorderManager();
-const audioCtx = wx.createWebAudioContext(true);
-const sampleSize = 512 * 2;
-let source = audioCtx.createBufferSource();
-let processor = audioCtx.createScriptProcessor(sampleSize, 1, 1);
-processor.channelInterpretation = 'speakers';
-processor.channelCount = 1;
+const audioCtx = wx.createWebAudioContext();
+const sampleSize = 512 * 8;
+// let source = audioCtx.createBufferSource();
+// let processor = audioCtx.createScriptProcessor(sampleSize, 1, 1);
+// processor.channelInterpretation = 'speakers';
+// processor.channelCount = 1;
 Page({
   spiceModel: undefined,
   data: {
@@ -22,18 +22,22 @@ Page({
       console.log('start录音');
     }); 
     let that = this;
+    
+    let processor = audioCtx.createScriptProcessor(sampleSize, 1, 1);
+    processor.channelInterpretation = 'speakers';
+    processor.channelCount = 1;
     processor.onaudioprocess = function(e) {
       const NUM_INPUT_SAMPLES = sampleSize;
       const CONF_THRESHOLD = 0.9;
       const channelData = e.inputBuffer.getChannelData(0);
-      // console.log(`channel data length: ${channelData.length}`);
+      console.log(`channel data length: ${channelData.length}`);
       if (that.spiceModel) {
         console.log('start execute model...');
         const input = tf.reshape(tf.tensor(channelData), [NUM_INPUT_SAMPLES])
         const output = that.spiceModel.getModel().execute({"input_audio_samples": input });
         const uncertainties = output[0].dataSync();
         const pitches = output[1].dataSync();
-        // console.log(`uncertainties: ${uncertainties}`);
+        console.log(`uncertainties: ${uncertainties}`);
 
         for (let i = 0; i < pitches.length; ++i) {
           let confidence = 1.0 - uncertainties[i];
@@ -48,13 +52,10 @@ Page({
         }
       }
     }
+    
+    
     recorderManager.onStop((res) => {
       let mySource = audioCtx.createBufferSource();
-      mySource.onended = function() {
-        console.log("source end");
-        mySource.disconnect(processor);
-        processor.disconnect(audioCtx.destination);
-      }
       
       this.tempFilePath = res.tempFilePath;
       console.log('停止录音', res.tempFilePath);
@@ -62,7 +63,6 @@ Page({
         filePath: this.tempFilePath,
         position: 0,
         success(res) {
-          
           audioCtx.decodeAudioData(res.data, (buffer) => {
             console.log(`ok: ${buffer.length}`);
             
@@ -70,6 +70,11 @@ Page({
             mySource.buffer = buffer;
             mySource.connect(processor);
             processor.connect(audioCtx.destination);
+            mySource.onended = function() {
+              console.log("source end");
+              mySource.disconnect(processor);
+              processor.disconnect(audioCtx.destination);
+            }
             mySource.start();
             
           }, (e) => {console.error(e)});
@@ -80,10 +85,10 @@ Page({
       });
       if (this.data.isRecording) {
         recorderManager.start({
-          duration: 1000,
+          duration: 300,
           sampleRate: 16000,
           numberOfChannels: 1,
-          encodeBitRate: 96000,
+          encodeBitRate: 24000,
           format: "mp3"
         });
       }
@@ -117,10 +122,10 @@ Page({
       isRecording: true,
     })
     recorderManager.start({
-      duration: 300,
+      duration: 1000,
       sampleRate: 16000,
       numberOfChannels: 1,
-      encodeBitRate: 96000,
+      encodeBitRate: 24000,
       format: "mp3"
     });
   },
