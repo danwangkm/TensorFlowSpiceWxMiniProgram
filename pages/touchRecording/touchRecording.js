@@ -6,11 +6,7 @@ const fs = wx.getFileSystemManager()
 const app = getApp()
 const recorderManager = wx.getRecorderManager();
 const audioCtx = wx.createWebAudioContext();
-const sampleSize = 512 * 8;
-// let source = audioCtx.createBufferSource();
-// let processor = audioCtx.createScriptProcessor(sampleSize, 1, 1);
-// processor.channelInterpretation = 'speakers';
-// processor.channelCount = 1;
+
 Page({
   spiceModel: undefined,
   data: {
@@ -22,41 +18,7 @@ Page({
       console.log('start录音');
     }); 
     let that = this;
-    
-    let processor = audioCtx.createScriptProcessor(sampleSize, 1, 1);
-    processor.channelInterpretation = 'speakers';
-    processor.channelCount = 1;
-    processor.onaudioprocess = function(e) {
-      const NUM_INPUT_SAMPLES = sampleSize;
-      const CONF_THRESHOLD = 0.9;
-      const channelData = e.inputBuffer.getChannelData(0);
-      console.log(`channel data length: ${channelData.length}`);
-      if (that.spiceModel) {
-        console.log('start execute model...');
-        const input = tf.reshape(tf.tensor(channelData), [NUM_INPUT_SAMPLES])
-        const output = that.spiceModel.getModel().execute({"input_audio_samples": input });
-        const uncertainties = output[0].dataSync();
-        const pitches = output[1].dataSync();
-        console.log(`uncertainties: ${uncertainties}`);
-
-        for (let i = 0; i < pitches.length; ++i) {
-          let confidence = 1.0 - uncertainties[i];
-          if (confidence < CONF_THRESHOLD) {
-            continue;
-          }
-          const pitch = that.spiceModel.getPitchHz(pitches[i]);
-          console.log(`getPitchHz: ${pitch}`);
-          that.setData({
-            motto: pitch
-          })
-        }
-      }
-    }
-    
-    
     recorderManager.onStop((res) => {
-      let mySource = audioCtx.createBufferSource();
-      
       this.tempFilePath = res.tempFilePath;
       console.log('停止录音', res.tempFilePath);
       fs.readFile({
@@ -64,18 +26,37 @@ Page({
         position: 0,
         success(res) {
           audioCtx.decodeAudioData(res.data, (buffer) => {
-            console.log(`ok: ${buffer.length}`);
-            
-            mySource.loop = false;
-            mySource.buffer = buffer;
-            mySource.connect(processor);
-            processor.connect(audioCtx.destination);
-            mySource.onended = function() {
-              console.log("source end");
-              mySource.disconnect(processor);
-              processor.disconnect(audioCtx.destination);
+            // console.log(`ok: ${buffer.length}`);
+            const NUM_INPUT_SAMPLES = 512 * 2;
+            const CONF_THRESHOLD = 0.9;
+            const channelData = buffer.getChannelData(0);
+            console.log(`channel data length: ${channelData.length}`);
+            if (that.spiceModel) {
+
+              for (let i=0; i < Math.floor(channelData.length / NUM_INPUT_SAMPLES); i++) {
+                const start = i * NUM_INPUT_SAMPLES;
+                console.log(`start execute model for [${start} to ${start + NUM_INPUT_SAMPLES}] blocke...`);
+                const input = tf.reshape(tf.tensor(channelData.slice(start, start + NUM_INPUT_SAMPLES)), [NUM_INPUT_SAMPLES])
+                const output = that.spiceModel.getModel().execute({"input_audio_samples": input });
+                const uncertainties = output[0].dataSync();
+                const pitches = output[1].dataSync();
+                // console.log(`uncertainties: ${uncertainties}`);
+
+                for (let i = 0; i < pitches.length; ++i) {
+                  let confidence = 1.0 - uncertainties[i];
+                  if (confidence < CONF_THRESHOLD) {
+                    continue;
+                  }
+                  const pitch = that.spiceModel.getPitchHz(pitches[i]);
+                  console.log(`getPitchHz: ${pitch}`);
+                  that.setData({
+                    motto: pitch
+                  })
+                }
+              }
+              
             }
-            mySource.start();
+            
             
           }, (e) => {console.error(e)});
         },
@@ -117,12 +98,12 @@ Page({
     }
   },
   onRecordTouchStartHandler(event) {
-    console.log(`start record: ${JSON.stringify(event)}`);
+    // console.log(`start record: ${JSON.stringify(event)}`);
     this.setData({
       isRecording: true,
     })
     recorderManager.start({
-      duration: 1000,
+      duration: 320,
       sampleRate: 16000,
       numberOfChannels: 1,
       encodeBitRate: 24000,

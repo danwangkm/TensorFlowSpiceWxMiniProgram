@@ -19,7 +19,7 @@ export class SpiceModel {
       console.log("try to load model from local storage");
       this.model = await tfc.loadGraphModel(storageHandler);
     } catch (e) {
-      console.log(`failed loading model from local storage because: ${JSON.stringify(e)}, try to load from TF hub...`);
+      console.log(`failed loading model from local storage because: ${JSON.stringify(e)}, try to load from TF hub for ${MODEL_URL}...`);
       this.model = await tfc.loadGraphModel(
         MODEL_URL,
         { fromTFHub: true }
