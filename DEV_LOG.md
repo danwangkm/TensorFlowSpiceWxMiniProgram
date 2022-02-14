@@ -9,7 +9,7 @@
         * https://github.com/dntj/jsfft
         * https://gist.github.com/corbanbrook/4ef7ce98fe4453d754cd7e4a341d6e5b
     2. Pitch
-        * https://github.com/peterkhayes/pitchfinder (more faster? https://www.npmjs.com/package/node-pitchfinder)
+        * https://github.com/peterkhayes/pitchfinder (more faster? https://www.npmjs.com/package/node-pitchfinder) pitchFinder is a workable solution when we use ADMS. YIN is not working. 但真机检测的时候读入文件太大，还是会卡住，需要用onframe的callback试试
         * https://stackoverflow.com/questions/69237143/how-do-i-get-the-audio-frequency-from-my-mic-using-javascript 这里有一些论文连接
         * https://stackoverflow.com/questions/45397325/js-audio-audiobuffer-getchanneldata-to-frequency (https://github.com/audiocogs/pitch.js/)
         
