@@ -66,7 +66,7 @@ Page({
       });
       if (this.data.isRecording) {
         recorderManager.start({
-          duration: 300,
+          duration: 32,
           sampleRate: 16000,
           numberOfChannels: 1,
           encodeBitRate: 24000,
@@ -79,7 +79,7 @@ Page({
     if (this.spiceModel == null) {
       console.log('loading spice model...');
       const model = new SpiceModel(this);
-      model.load().then(() => {
+      model.load(true).then(() => {
         this.spiceModel = model;
         console.log('loaded spice model successfully');
         wx.showToast({
@@ -103,7 +103,7 @@ Page({
       isRecording: true,
     })
     recorderManager.start({
-      duration: 320,
+      duration: 32,
       sampleRate: 16000,
       numberOfChannels: 1,
       encodeBitRate: 24000,

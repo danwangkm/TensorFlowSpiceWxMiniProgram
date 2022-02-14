@@ -12,10 +12,13 @@ export class SpiceModel {
   model = tfc.GraphModel;
   constructor() { }
 
-  async load() {
+  async load(forceRefresh = false) {
     // const storageHandler = getApp().globalData.fileStorageIO(`${wx.env.USER_DATA_PATH}/mymodel`, wx.getFileSystemManager());
     const storageHandler = getApp().globalData.localStorageIO(STORAGE_KEY);
     try {
+      if (forceRefresh) {
+        throw Exception("forceRefresh");
+      }
       console.log("try to load model from local storage");
       this.model = await tfc.loadGraphModel(storageHandler);
     } catch (e) {
