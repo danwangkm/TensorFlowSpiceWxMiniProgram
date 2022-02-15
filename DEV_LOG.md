@@ -12,4 +12,17 @@
         * https://github.com/peterkhayes/pitchfinder (more faster? https://www.npmjs.com/package/node-pitchfinder) pitchFinder is a workable solution when we use ADMS. YIN is not working. 但真机检测的时候读入文件太大，还是会卡住，需要用onframe的callback试试
         * https://stackoverflow.com/questions/69237143/how-do-i-get-the-audio-frequency-from-my-mic-using-javascript 这里有一些论文连接
         * https://stackoverflow.com/questions/45397325/js-audio-audiobuffer-getchanneldata-to-frequency (https://github.com/audiocogs/pitch.js/)
+
+Next Step
+* 研究一下pitch.js的使用
+* 将pitch.js里面的fft替换成node-fft试试
+* 研究一下p5里面的fft好不好用以及原理
+* 替换
+
+学习
+* FFT的代码实现以及意义
+* 从FFT里面如何获得Pitch detact
+  * 一种简单的频域音高检测算法就是HPS(harmonic product spectrum)
+    * http://catx.me/2014/08/26/html5-sound-visualization-experiment-with-processingjs/
+    * https://cnx.org/contents/aY7_vV4-@5.8:i5AAkZCP@2/Pitch-Detection-Algorithms
         
