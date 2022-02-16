@@ -5,7 +5,7 @@
     1. FFT
         * https://github.com/xiangyuecn/Recorder/blob/master/src/extensions/lib.fft.js
         * https://github.com/vail-systems/node-fft
-        * https://github.com/indutny/fft.js/ (ex. https://stackoverflow.com/questions/61547281/how-to-get-frequency-spectrum-from-an-audio-wav-file-using-fft-js-with-node-js and https://github.com/indutny/fft.js)
+        * https://github.com/indutny/fft.js/ (ex. https://stackoverflow.com/questions/61547281/how-to-get-frequency-spectrum-from-an-audio-wav-file-using-fft-js-with-node-js and https://cjting.me/2021/08/07/fourier-transform-and-audio-visualization)
         * https://github.com/dntj/jsfft
         * https://gist.github.com/corbanbrook/4ef7ce98fe4453d754cd7e4a341d6e5b
     2. Pitch
@@ -17,7 +17,8 @@ Next Step
 * 研究一下pitch.js的使用
 * 将pitch.js里面的fft替换成node-fft试试
 * 研究一下p5里面的fft好不好用以及原理 (p5 实际使用了[Web API 的 AnalyserNode](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode) 来[获取fft频域数据](https://github.com/processing/p5.js/blob/v1.4.1/lib/addons/p5.sound.js#L3641)，即fft的实现依赖于webapi而不是p5 package。不过可以在研究一下p5基于频域数据的处理，例如getCentroid()，getEnergy())
-* 替换onframe callback
+    * p5 文件近6MB （https://www.npmjs.com/package/p5）不适合小程序，不过其频域数据的处理思路和理论可以参考。开源模式为LGPL-2.1。
+* 替换onframe callback, create new page
 * remove tf dependency to reduce size of program
 
 学习
@@ -28,3 +29,5 @@ Next Step
     * https://cnx.org/contents/aY7_vV4-@5.8:i5AAkZCP@2/Pitch-Detection-Algorithms
 * 音乐理论学习
     * https://www.lightnote.co/music-theory/harmony
+* 音频预处理
+    * https://www.jianshu.com/p/5031635a4fbd
