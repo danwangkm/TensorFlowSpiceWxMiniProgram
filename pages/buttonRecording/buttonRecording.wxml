@@ -1,0 +1,10 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="data">
+    <text class="user-motto">{{motto}}</text>
+  </view>
+  <view class="control">
+    <button class="weui-btn weui-btn_primary" bindtap="onStartTapHandler">Start</button>
+    <button class="weui-btn weui-btn_default" bindtap="onEndTapHandler">End</button>
+  </view>
+</view>
