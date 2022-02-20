@@ -23,7 +23,6 @@ Page({
       console.log('停止录音', res.tempFilePath);
     });
     let prefix;
-    let finalAudio;
     recorderManager.onFrameRecorded((res) => {
       // recordList.push(res.frameBuffer);
       console.log(`bytelength: ${res.frameBuffer.byteLength}`);
@@ -36,21 +35,7 @@ Page({
       }
       audioCtx.decodeAudioData(temp, (res) => {
         console.log(`yes: ${res.getChannelData(0)}`);
-        // if (!finalAudio) {
-        //   finalAudio = res;
-        // } else {
-        //   let tmp = audioCtx.createBuffer(1, (finalAudio.length + res.length), finalAudio.sampleRate );
-        //   let channel = tmp.getChannelData(0);
-        //   channel.set( finalAudio.getChannelData(0), 0);
-        //   channel.set( res.getChannelData(0), finalAudio.length);
-        //   finalAudio = tmp;
-        // }
-        // if (index === recordList.length - 1) {
-        //   console.log('final index');
-        //   source.buffer = finalAudio;
-        //   source.connect(audioCtx.destination);
-        //   source.start();
-        // }
+        
       }, (error) => {
         console.error(error);
       });
