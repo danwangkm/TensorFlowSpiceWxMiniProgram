@@ -13,12 +13,14 @@
         * https://stackoverflow.com/questions/69237143/how-do-i-get-the-audio-frequency-from-my-mic-using-javascript 这里有一些论文连接
         * https://stackoverflow.com/questions/45397325/js-audio-audiobuffer-getchanneldata-to-frequency (https://github.com/audiocogs/pitch.js/)
 
+current working on
+* 替换onframe callback, create new page 
+
 Next Step
 * 研究一下pitch.js的使用
 * 将pitch.js里面的fft替换成node-fft试试
 * 研究一下p5里面的fft好不好用以及原理 (p5 实际使用了[Web API 的 AnalyserNode](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode) 来[获取fft频域数据](https://github.com/processing/p5.js/blob/v1.4.1/lib/addons/p5.sound.js#L3641)，即fft的实现依赖于webapi而不是p5 package。不过可以在研究一下p5基于频域数据的处理，例如getCentroid()，getEnergy())
     * p5 文件近6MB （https://www.npmjs.com/package/p5）不适合小程序，不过其频域数据的处理思路和理论可以参考。开源模式为LGPL-2.1。
-* 替换onframe callback, create new page
 * remove tf dependency to reduce size of program
 
 学习
