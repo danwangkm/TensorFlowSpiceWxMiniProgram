@@ -35,7 +35,11 @@ Page({
       }
       audioCtx.decodeAudioData(temp, (res) => {
         console.log(`yes: ${res.getChannelData(0)}`);
-        
+        const pitch = detectPitch(res.getChannelData(0));
+        console.log(`pitch: ${pitch}`);
+        that.setData({
+          motto: pitch
+        });
       }, (error) => {
         console.error(error);
       });
